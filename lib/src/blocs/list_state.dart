@@ -12,11 +12,6 @@ class ListLoaded<T> extends ListState {
   ListLoaded(this.items);
 }
 
-class ListEmpty extends ListState {
-  final bool empty;
-  ListEmpty(this.empty);
-}
-
 class ListError extends ListState {
   final String message;
   ListError(this.message);

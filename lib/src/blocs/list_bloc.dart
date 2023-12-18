@@ -33,11 +33,12 @@ class ListBloc<T> extends Bloc<DataEvent, ListState> {
 
     try {
       final items = await dataProvider();
-      if (items.isEmpty) {
-        emit(ListEmpty(true));
-      } else {
-        emit(ListLoaded<T>(items));
-      }
+      emit(ListLoaded<T>(items));
+      // if (items.isEmpty) {
+      //   emit(ListEmpty(true));
+      // } else {
+      //   emit(ListLoaded<T>(items));
+      // }
     } catch (e) {
       emit(ListError(e.toString()));
     }

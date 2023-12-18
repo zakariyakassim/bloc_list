@@ -8,8 +8,8 @@ class BlocList<T, B extends BlocBase<S>, S> extends StatefulWidget {
   final Function loadData;
   final S Function(S) stateCondition;
   final Widget Function(BuildContext, S, List<T>?)? alternateBuilder;
-  final Widget? emptyBuilder;
-  final Widget? loadingBuilder;
+  final Widget Function(BuildContext, S)? emptyBuilder;
+  final Widget Function(BuildContext, S)? loadBuilder;
 
   const BlocList({
     super.key,
@@ -19,7 +19,7 @@ class BlocList<T, B extends BlocBase<S>, S> extends StatefulWidget {
     required this.stateCondition,
     this.alternateBuilder,
     this.emptyBuilder,
-    this.loadingBuilder,
+    this.loadBuilder,
   });
 
   @override
@@ -51,28 +51,50 @@ class _BlocListState<T, B extends BlocBase<S>, S>
             items = loadedState.items;
           }
 
-          // Wrap the UI with RefreshIndicator
           return RefreshIndicator(
-            onRefresh: () async => widget.loadData(),
-            child: widget.alternateBuilder != null && items != null
-                ? widget.alternateBuilder!(context, state, items)
-                : items != null
-                    ? _listViewWidget(state)
-                    : items != null && items!.isEmpty
-                        ? emptyBuilder()
-                        : _loadingOrErrorWidget(state),
-          );
+              onRefresh: () async => widget.loadData(), child: content(state));
         },
       ),
     );
   }
 
-  Widget emptyBuilder() {
-    // if (items!.isEmpty) {
-    return widget.emptyBuilder != null
-        ? widget.emptyBuilder!
-        : const Center(child: Text('No items found'));
-    // }
+  Widget content(S state) {
+    if (items != null && items!.isEmpty) {
+      return emptyBuilder(state);
+    }
+
+    if (items != null && widget.alternateBuilder != null) {
+      return widget.alternateBuilder!(context, state, items);
+    } else if (items != null && widget.alternateBuilder == null) {
+      return _listViewWidget(state);
+    } else {
+      return _loadingOrErrorWidget(state);
+    }
+  }
+
+  Widget emptyBuilder(S state) {
+    if (widget.emptyBuilder != null) {
+      return widget.emptyBuilder!(context, state);
+    } else {
+      return Center(
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+            const Text('No Data',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.grey,
+                )),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                widget.loadData();
+              },
+              child: const Text('Refresh'),
+            )
+          ]));
+    }
   }
 
   Widget _listViewWidget(S state) {
@@ -84,19 +106,10 @@ class _BlocListState<T, B extends BlocBase<S>, S>
               ? widget.itemBuilder!(context, index, items![index])
               : const Text('No item builder defined');
         } else {
-          return _bottomLoader();
+          return _loadingOrErrorWidget(state);
         }
       },
     );
-  }
-
-  Widget _bottomLoader() {
-    return isLoading
-        ? const Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.0),
-            child: Center(child: CircularProgressIndicator()),
-          )
-        : const SizedBox.shrink();
   }
 
   Widget _loadingOrErrorWidget(S state) {
@@ -104,6 +117,14 @@ class _BlocListState<T, B extends BlocBase<S>, S>
       var errorState = widget.stateCondition(state) as ListError;
       return Center(child: Text('Error: ${errorState.message}'));
     }
-    return const Center(child: CircularProgressIndicator());
+
+    if (widget.loadBuilder != null) {
+      return widget.loadBuilder!(context, state);
+    } else {
+      return const Center(
+          child: CircularProgressIndicator(
+        color: Colors.red,
+      ));
+    }
   }
 }
