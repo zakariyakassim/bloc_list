@@ -10,9 +10,9 @@ class AddDataEvent<T> extends DataEvent {
   AddDataEvent(this.item);
 }
 
-class DeleteDataEvent extends DataEvent {
-  final String id;
-  DeleteDataEvent(this.id);
+class DeleteDataEvent<T> extends DataEvent {
+  final T item;
+  DeleteDataEvent(this.item);
 }
 
 class UpdateDataEvent<T> extends DataEvent {

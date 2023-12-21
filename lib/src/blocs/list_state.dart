@@ -12,6 +12,16 @@ class ListLoaded<T> extends ListState {
   ListLoaded(this.items);
 }
 
+class DataAdded<T> extends ListState {
+  final T addedItem;
+  DataAdded(this.addedItem);
+}
+
+class DataDeleted<T> extends ListState {
+  final T item;
+  DataDeleted(this.item);
+}
+
 class ListError extends ListState {
   final String message;
   ListError(this.message);

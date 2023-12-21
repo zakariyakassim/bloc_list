@@ -10,6 +10,8 @@ class BlocList<T, B extends BlocBase<S>, S> extends StatefulWidget {
   final Widget Function(BuildContext, S, List<T>?)? alternateBuilder;
   final Widget Function(BuildContext, S)? emptyBuilder;
   final Widget Function(BuildContext, S)? loadBuilder;
+  final Function? onItemDeleted;
+  final Function? onItemAdded;
 
   const BlocList({
     super.key,
@@ -20,6 +22,8 @@ class BlocList<T, B extends BlocBase<S>, S> extends StatefulWidget {
     this.alternateBuilder,
     this.emptyBuilder,
     this.loadBuilder,
+    this.onItemDeleted,
+    this.onItemAdded,
   });
 
   @override
@@ -39,23 +43,39 @@ class _BlocListState<T, B extends BlocBase<S>, S>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
-      body: BlocBuilder<B, S>(
-        builder: (context, state) {
-          isLoading =
-              widget.stateCondition(state) is ListLoading && items == null;
-
-          if (widget.stateCondition(state) is ListLoaded<T>) {
-            var loadedState = widget.stateCondition(state) as ListLoaded<T>;
-            items = loadedState.items;
+    return BlocListener<B, S>(listener: (context, state) {
+      if (widget.stateCondition(state) is DataDeleted<T>) {
+        var deletedState = widget.stateCondition(state) as DataDeleted;
+        if (items != null) {
+          items!.remove(deletedState.item);
+          if (widget.onItemDeleted != null) {
+            widget.onItemDeleted!();
           }
+        }
+      }
+      if (widget.stateCondition(state) is DataAdded<T>) {
+        var addedState = widget.stateCondition(state) as DataAdded<T>;
+        if (items != null) {
+          items!.insert(0, addedState.addedItem);
+          if (widget.onItemAdded != null) {
+            widget.onItemAdded!();
+          }
+        }
+      }
+    }, child: BlocBuilder<B, S>(
+      builder: (context, state) {
+        isLoading =
+            widget.stateCondition(state) is ListLoading && items == null;
 
-          return RefreshIndicator(
-              onRefresh: () async => widget.loadData(), child: content(state));
-        },
-      ),
-    );
+        if (widget.stateCondition(state) is ListLoaded<T>) {
+          var loadedState = widget.stateCondition(state) as ListLoaded<T>;
+          items = loadedState.items;
+        }
+
+        return RefreshIndicator(
+            onRefresh: () async => widget.loadData(), child: content(state));
+      },
+    ));
   }
 
   Widget content(S state) {
