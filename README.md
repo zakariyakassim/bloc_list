@@ -10,6 +10,17 @@ TODO: Quick examples
 <img src="https://raw.githubusercontent.com/zakariyakassim/bloc_list/master/screenshots/preview.gif?raw=true" width="300"/>
 </p>
 
+<p>Using flutter_bloc</p>
+```dart
+void main() {
+  runApp(MultiBlocProvider(
+    providers: [
+      BlocProvider(create: (_) => TodoBloc(DataService())),
+    ],
+    child: const MainApp(),
+  ));
+}
+```
 
 ```dart
   @override
