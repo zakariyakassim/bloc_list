@@ -3,27 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BlocList<T, B extends BlocBase<S>, S> extends StatefulWidget {
-  final String title;
   final Widget Function(BuildContext, int, T)? itemBuilder;
   final Function loadData;
   final S Function(S) stateCondition;
   final Widget Function(BuildContext, S, List<T>?)? alternateBuilder;
   final Widget Function(BuildContext, S)? emptyBuilder;
   final Widget Function(BuildContext, S)? loadBuilder;
-  final Function? onItemDeleted;
-  final Function? onItemAdded;
+  final Function(T deletedItem)? onItemDeleted;
+  final Function(T addedItem)? onItemAdded;
+  final Function(T newItem, T oldItem)? onItemUpdated;
 
   const BlocList({
     super.key,
     this.itemBuilder,
     required this.loadData,
-    required this.title,
     required this.stateCondition,
     this.alternateBuilder,
     this.emptyBuilder,
     this.loadBuilder,
     this.onItemDeleted,
     this.onItemAdded,
+    this.onItemUpdated,
   });
 
   @override
@@ -46,20 +46,20 @@ class _BlocListState<T, B extends BlocBase<S>, S>
     return BlocListener<B, S>(listener: (context, state) {
       if (widget.stateCondition(state) is DataDeleted<T>) {
         var deletedState = widget.stateCondition(state) as DataDeleted;
-        if (items != null) {
-          items!.remove(deletedState.item);
-          if (widget.onItemDeleted != null) {
-            widget.onItemDeleted!();
-          }
+        if (widget.onItemDeleted != null) {
+          widget.onItemDeleted!(deletedState.item);
         }
       }
       if (widget.stateCondition(state) is DataAdded<T>) {
-        var addedState = widget.stateCondition(state) as DataAdded<T>;
-        if (items != null) {
-          items!.insert(0, addedState.addedItem);
-          if (widget.onItemAdded != null) {
-            widget.onItemAdded!();
-          }
+        var addedState = widget.stateCondition(state) as DataAdded;
+        if (widget.onItemAdded != null) {
+          widget.onItemAdded!(addedState.item);
+        }
+      }
+      if (widget.stateCondition(state) is DataUpdated<T>) {
+        var updatedState = widget.stateCondition(state) as DataUpdated;
+        if (widget.onItemUpdated != null) {
+          widget.onItemUpdated!(updatedState.newItem, updatedState.oldItem);
         }
       }
     }, child: BlocBuilder<B, S>(

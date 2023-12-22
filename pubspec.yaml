@@ -1,9 +1,11 @@
 name: bloc_list
 description: "A flexible and customizable list widget for Flutter applications using the BLoC pattern for state management. It offers dynamic data loading, state-dependent rendering, custom loader support, and error handling, ideal for creating responsive and user-friendly list views."
-version: 0.0.1
+version: 0.0.3
 repository: https://github.com/zakariyakassim/bloc_list
 issue_tracker: https://github.com/zakariyakassim/bloc_list/issues
- 
+screenshots: 
+  - https://raw.githubusercontent.com/zakariyakassim/bloc_list/master/screenshots/preview.gif
+
 environment:
   sdk: '>=3.2.3 <4.0.0'
   flutter: ">=1.17.0"

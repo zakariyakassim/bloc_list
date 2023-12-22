@@ -16,6 +16,7 @@ class DeleteDataEvent<T> extends DataEvent {
 }
 
 class UpdateDataEvent<T> extends DataEvent {
-  final T item;
-  UpdateDataEvent(this.item);
+  final T newItem;
+  final T oldItem;
+  UpdateDataEvent({required this.newItem, required this.oldItem});
 }

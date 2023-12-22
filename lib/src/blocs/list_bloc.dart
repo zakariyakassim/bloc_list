@@ -53,6 +53,7 @@ class ListBloc<T> extends Bloc<DataEvent, ListState> {
         final currentState = state;
         if (currentState is ListLoaded<T>) {
           emit(DataAdded<T>(event.item));
+          emit(ListLoaded<T>([event.item, ...currentState.items]));
         }
       }
     }
@@ -65,7 +66,10 @@ class ListBloc<T> extends Bloc<DataEvent, ListState> {
       if (deleted) {
         final currentState = state;
         if (currentState is ListLoaded<T>) {
+          final updatedItems = List<T>.from(currentState.items);
+          updatedItems.remove(event.item);
           emit(DataDeleted<T>(event.item));
+          emit(ListLoaded<T>(updatedItems));
         }
       }
     }
@@ -74,15 +78,21 @@ class ListBloc<T> extends Bloc<DataEvent, ListState> {
   FutureOr<void> _onUpdateData(
       UpdateDataEvent<T> event, Emitter<ListState> emit) async {
     if (dataUpdater != null) {
-      bool updated = await dataUpdater!(event.item);
+      bool updated = await dataUpdater!(event.newItem);
       if (updated) {
         final currentState = state;
         if (currentState is ListLoaded<T>) {
           final updatedItems = List<T>.from(currentState.items);
-          var updatedItem =
-              updatedItems.firstWhere((element) => element == event.item);
-          updatedItems[updatedItems.indexOf(updatedItem)] = event.item;
-          emit(ListLoaded<T>(updatedItems));
+
+          int itemIndex =
+              updatedItems.indexWhere((element) => element == event.oldItem);
+
+          if (itemIndex != -1) {
+            updatedItems[itemIndex] = event.newItem;
+            emit(
+                DataUpdated<T>(oldItem: event.oldItem, newItem: event.newItem));
+            emit(ListLoaded<T>(updatedItems));
+          }
         }
       }
     }

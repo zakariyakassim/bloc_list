@@ -13,13 +13,19 @@ class ListLoaded<T> extends ListState {
 }
 
 class DataAdded<T> extends ListState {
-  final T addedItem;
-  DataAdded(this.addedItem);
+  final T item;
+  DataAdded(this.item);
 }
 
 class DataDeleted<T> extends ListState {
   final T item;
   DataDeleted(this.item);
+}
+
+class DataUpdated<T> extends ListState {
+  final T newItem;
+  final T oldItem;
+  DataUpdated({required this.newItem, required this.oldItem});
 }
 
 class ListError extends ListState {
