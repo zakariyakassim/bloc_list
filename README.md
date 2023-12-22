@@ -6,6 +6,10 @@ TODO: A flexible and customizable list widget for Flutter applications using the
 
 TODO: Quick examples
 
+<p align="center">
+<img src="https://raw.githubusercontent.com/zakariyakassim/bloc_list/master/screenshots/preview.gif?raw=true" width="300"/>
+</p>
+
 
 ```dart
   @override
