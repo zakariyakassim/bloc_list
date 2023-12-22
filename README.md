@@ -11,6 +11,7 @@ TODO: Quick examples
 </p>
 
 <p>Using flutter_bloc</p>
+
 ```dart
 void main() {
   runApp(MultiBlocProvider(
