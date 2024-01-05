@@ -1,6 +1,6 @@
 ## Getting started
 
-TODO: A flexible and customizable list widget for Flutter applications using the BLoC pattern for state management. It offers dynamic data loading, state-dependent rendering, custom loader support, and error handling, ideal for creating responsive and user-friendly list views.
+A flexible and customizable list widget for Flutter applications using the BLoC pattern for state management. It offers dynamic data loading, state-dependent rendering, custom loader support, and error handling, ideal for creating responsive and user-friendly list views.
 
 ## Usage
 
@@ -131,5 +131,4 @@ class TodoBloc extends ListBloc<TodoModel> {
           dataUpdater: (item) => dataService.updateTodo(item),
         );
 }
-
 ```

@@ -25,13 +25,4 @@ class ChatModel {
       incoming: json['incoming'],
     );
   }
-
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     'name': name,
-  //     'message': message,
-  //     'time': created,
-  //     'incoming': incoming,
-  //   };
-  // }
 }

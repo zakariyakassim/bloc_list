@@ -17,12 +17,4 @@ class TodoModel {
         created:
             json['created'] != null ? DateTime.parse(json['created']) : null);
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'description': description,
-      'created': created.toIso8601String(),
-    };
-  }
 }
