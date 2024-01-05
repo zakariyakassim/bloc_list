@@ -3,7 +3,10 @@ part of 'list_bloc.dart';
 @immutable
 sealed class DataEvent {}
 
-class LoadDataEvent extends DataEvent {}
+class LoadDataEvent<T> extends DataEvent {
+  final T? data;
+  LoadDataEvent({this.data});
+}
 
 class AddDataEvent<T> extends DataEvent {
   final T item;

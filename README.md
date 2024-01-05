@@ -44,35 +44,51 @@ void main() {
               color: Colors.black,
             ));
           },
+          onItemAdding: (addingItem) {
+            addingItem.isBusy = true;
+          },
+          onItemDeleting: (deletingItem) {
+            deletingItem.isBusy = true;
+          },
+          onItemUpdating: (newItem, oldItem) {
+            oldItem.isBusy = true;
+          },
           onItemDeleted: (deletedItem) {
             _displaySnackBar(context, "Deleted ${deletedItem.description}");
           },
           onItemUpdated: (newItem, oldItem) {
-            Navigator.pop(context);
             _displaySnackBar(context,
                 "Updated ${oldItem.description} to ${newItem.description}");
           },
           onItemAdded: (addedItem) {
-            Navigator.pop(context);
+            addedItem.isBusy = false;
             _displaySnackBar(context, "Added ${addedItem.description}");
           },
           itemBuilder: (context, index, item) {
+            // var added = item.id != null;
+
             var outputFormat = DateFormat('dd MMM yyyy HH:mm');
             var date = outputFormat.format(item.created);
 
             return ListTile(
-              title: Text(item.description),
+              title: Text(
+                item.description,
+                style:
+                    TextStyle(color: item.isBusy ? Colors.grey : Colors.black),
+              ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.edit),
+                    icon: Icon(Icons.edit,
+                        color: item.isBusy ? Colors.grey : Colors.black),
                     onPressed: () {
                       _addOrUpdateTodoItem(context, index: index, item: item);
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete),
+                    icon: Icon(Icons.delete,
+                        color: item.isBusy ? Colors.grey : Colors.black),
                     onPressed: () {
                       _deleteDialog(context, () {
                         BlocProvider.of<TodoBloc>(context)
@@ -84,7 +100,11 @@ void main() {
               ),
               subtitle: Padding(
                 padding: const EdgeInsets.only(top: 5.0),
-                child: Text(date),
+                child: Text(
+                  date,
+                  style: TextStyle(
+                      color: item.isBusy ? Colors.grey : Colors.black54),
+                ),
               ),
             );
           },
@@ -101,12 +121,13 @@ class TodoBloc extends ListBloc<TodoModel> {
   final DataService dataService;
   TodoBloc(this.dataService)
       : super(
-          dataProvider: () => dataService.getTodoList(),
-          dataAdder: (item) => dataService.add(item),
-          dataDeleter: (item) => dataService.delete(item),
+          dataProvider: ([id]) => dataService.getTodoList(id),
+          dataAdder: (item) => dataService.addTodo(item),
+          dataDeleter: (item) => dataService.deleteTodo(item),
           dataSorter: (items, [compare]) =>
               items.sort((a, b) => b.created.compareTo(a.created)),
-          dataUpdater: (item) => dataService.update(item),
+          dataUpdater: (item) => dataService.updateTodo(item),
         );
 }
+
 ```

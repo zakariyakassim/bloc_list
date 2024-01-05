@@ -33,35 +33,51 @@ class _TodoListPageState extends State<TodoListPage> {
               color: Colors.black,
             ));
           },
+          onItemAdding: (addingItem) {
+            addingItem.isBusy = true;
+          },
+          onItemDeleting: (deletingItem) {
+            deletingItem.isBusy = true;
+          },
+          onItemUpdating: (newItem, oldItem) {
+            oldItem.isBusy = true;
+          },
           onItemDeleted: (deletedItem) {
             _displaySnackBar(context, "Deleted ${deletedItem.description}");
           },
           onItemUpdated: (newItem, oldItem) {
-            Navigator.pop(context);
             _displaySnackBar(context,
                 "Updated ${oldItem.description} to ${newItem.description}");
           },
           onItemAdded: (addedItem) {
-            Navigator.pop(context);
+            addedItem.isBusy = false;
             _displaySnackBar(context, "Added ${addedItem.description}");
           },
           itemBuilder: (context, index, item) {
+            // var added = item.id != null;
+
             var outputFormat = DateFormat('dd MMM yyyy HH:mm');
             var date = outputFormat.format(item.created);
 
             return ListTile(
-              title: Text(item.description),
+              title: Text(
+                item.description,
+                style:
+                    TextStyle(color: item.isBusy ? Colors.grey : Colors.black),
+              ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.edit),
+                    icon: Icon(Icons.edit,
+                        color: item.isBusy ? Colors.grey : Colors.black),
                     onPressed: () {
                       _addOrUpdateTodoItem(context, index: index, item: item);
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete),
+                    icon: Icon(Icons.delete,
+                        color: item.isBusy ? Colors.grey : Colors.black),
                     onPressed: () {
                       _deleteDialog(context, () {
                         BlocProvider.of<TodoBloc>(context)
@@ -73,7 +89,11 @@ class _TodoListPageState extends State<TodoListPage> {
               ),
               subtitle: Padding(
                 padding: const EdgeInsets.only(top: 5.0),
-                child: Text(date),
+                child: Text(
+                  date,
+                  style: TextStyle(
+                      color: item.isBusy ? Colors.grey : Colors.black54),
+                ),
               ),
             );
           },
@@ -111,15 +131,15 @@ class _TodoListPageState extends State<TodoListPage> {
                 onPressed: () {
                   if (item == null) {
                     BlocProvider.of<TodoBloc>(context).add(AddDataEvent(
-                        TodoModel(
-                            id: 1, description: descriptionController.text)));
-                  } else if (index != null) {
+                        TodoModel(description: descriptionController.text)));
+                  } else {
                     BlocProvider.of<TodoBloc>(context).add(UpdateDataEvent(
                         oldItem: item,
                         newItem: TodoModel(
                             id: item.id,
                             description: descriptionController.text)));
                   }
+                  Navigator.pop(context);
                 },
                 child: Text(item == null ? 'Add' : 'Update'),
               ),

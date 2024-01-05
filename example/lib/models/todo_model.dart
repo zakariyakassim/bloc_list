@@ -1,13 +1,14 @@
 class TodoModel {
-  final int id;
+  int? id;
   final String description;
   DateTime created;
-
-  TodoModel({
-    required this.id,
-    required this.description,
-    DateTime? created,
-  }) : created = created ?? DateTime.now();
+  bool isBusy;
+  TodoModel(
+      {this.id,
+      required this.description,
+      DateTime? created,
+      this.isBusy = false})
+      : created = created ?? DateTime.now();
 
   factory TodoModel.fromJson(Map<dynamic, dynamic> json) {
     return TodoModel(

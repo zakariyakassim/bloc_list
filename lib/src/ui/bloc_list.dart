@@ -2,6 +2,8 @@ import 'package:bloc_list/src/blocs/list_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+enum ListAction { append, prepend }
+
 class BlocList<T, B extends BlocBase<S>, S> extends StatefulWidget {
   final Widget Function(BuildContext, int, T)? itemBuilder;
   final Function loadData;
@@ -11,7 +13,11 @@ class BlocList<T, B extends BlocBase<S>, S> extends StatefulWidget {
   final Widget Function(BuildContext, S)? loadBuilder;
   final Function(T deletedItem)? onItemDeleted;
   final Function(T addedItem)? onItemAdded;
+  final Function(T addedItem)? onItemAdding;
   final Function(T newItem, T oldItem)? onItemUpdated;
+  final Function(T deletingItem)? onItemDeleting;
+  final Function(T newItem, T oldItem)? onItemUpdating;
+  final ListAction listAction;
 
   const BlocList({
     super.key,
@@ -24,6 +30,10 @@ class BlocList<T, B extends BlocBase<S>, S> extends StatefulWidget {
     this.onItemDeleted,
     this.onItemAdded,
     this.onItemUpdated,
+    this.onItemAdding,
+    this.onItemDeleting,
+    this.onItemUpdating,
+    this.listAction = ListAction.prepend,
   });
 
   @override
@@ -56,6 +66,34 @@ class _BlocListState<T, B extends BlocBase<S>, S>
           widget.onItemAdded!(addedState.item);
         }
       }
+      if (widget.stateCondition(state) is DataAdding<T>) {
+        var addingState = widget.stateCondition(state) as DataAdding;
+        if (widget.onItemAdding != null) {
+          widget.onItemAdding!(addingState.item);
+        }
+        if (items != null) {
+          switch (widget.listAction) {
+            case ListAction.append:
+              items!.add(addingState.item);
+              break;
+            case ListAction.prepend:
+              items!.insert(0, addingState.item);
+              break;
+          }
+        }
+      }
+      if (widget.stateCondition(state) is DataDeleting<T>) {
+        var deletingState = widget.stateCondition(state) as DataDeleting;
+        if (widget.onItemDeleting != null) {
+          widget.onItemDeleting!(deletingState.item);
+        }
+      }
+      if (widget.stateCondition(state) is DataUpdating<T>) {
+        var updatingState = widget.stateCondition(state) as DataUpdating;
+        if (widget.onItemUpdating != null) {
+          widget.onItemUpdating!(updatingState.newItem, updatingState.oldItem);
+        }
+      }
       if (widget.stateCondition(state) is DataUpdated<T>) {
         var updatedState = widget.stateCondition(state) as DataUpdated;
         if (widget.onItemUpdated != null) {
@@ -69,7 +107,9 @@ class _BlocListState<T, B extends BlocBase<S>, S>
 
         if (widget.stateCondition(state) is ListLoaded<T>) {
           var loadedState = widget.stateCondition(state) as ListLoaded<T>;
-          items = loadedState.items;
+          if (loadedState.items != null) {
+            items = loadedState.items;
+          }
         }
 
         return RefreshIndicator(

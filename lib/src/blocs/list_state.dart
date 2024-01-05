@@ -8,13 +8,29 @@ class ListInitial extends ListState {}
 class ListLoading extends ListState {}
 
 class ListLoaded<T> extends ListState {
-  final List<T> items;
+  final List<T>? items;
   ListLoaded(this.items);
 }
 
 class DataAdded<T> extends ListState {
-  final T item;
+  final T? item;
   DataAdded(this.item);
+}
+
+class DataDeleting<T> extends ListState {
+  final T? item;
+  DataDeleting(this.item);
+}
+
+class DataUpdating<T> extends ListState {
+  final T newItem;
+  final T oldItem;
+  DataUpdating({required this.newItem, required this.oldItem});
+}
+
+class DataAdding<T> extends ListState {
+  final T? item;
+  DataAdding(this.item);
 }
 
 class DataDeleted<T> extends ListState {
