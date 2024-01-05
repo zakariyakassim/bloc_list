@@ -46,7 +46,7 @@ class ListBloc<T> extends Bloc<DataEvent, ListState> {
       if (items.isNotEmpty && dataSorter != null) {
         dataSorter!(items);
       }
-      emit(ListLoaded<T>(items));
+      emit(ListLoaded<T>(items, updateList: true));
     } catch (e) {
       emit(ListError(e.toString()));
     }
@@ -69,7 +69,7 @@ class ListBloc<T> extends Bloc<DataEvent, ListState> {
             newList[index] = response.data as T;
           }
           emit(DataAdded<T>(response.data));
-          emit(ListLoaded<T>(null));
+          emit(ListLoaded<T>(newList, updateList: false));
         }
       }
     }
@@ -88,30 +88,11 @@ class ListBloc<T> extends Bloc<DataEvent, ListState> {
           final updatedItems = List<T>.from(currentState.items ?? []);
           updatedItems.remove(event.item);
           emit(DataDeleted<T>(event.item));
-          emit(ListLoaded<T>(updatedItems));
+          emit(ListLoaded<T>(updatedItems, updateList: true));
         }
       }
     }
   }
-
-  //   FutureOr<void> _onDeleteData(
-  //     DeleteDataEvent event, Emitter<ListState> emit) async {
-  //   if (dataDeleter != null) {
-
-  //     emit(DataDeleting<T>(event.item));
-  //     bool deleted = await dataDeleter!(event.item);
-
-  //     if (deleted) {
-  //       final currentState = state;
-  //       if (currentState is ListLoaded<T>) {
-  //         final updatedItems = List<T>.from(currentState.items ?? []);
-  //         updatedItems.remove(event.item);
-  //         emit(DataDeleted<T>(event.item));
-  //         emit(ListLoaded<T>(updatedItems));
-  //       }
-  //     }
-  //   }
-  // }
 
   FutureOr<void> _onUpdateData(
       UpdateDataEvent<T> event, Emitter<ListState> emit) async {
@@ -130,7 +111,7 @@ class ListBloc<T> extends Bloc<DataEvent, ListState> {
             updatedItems[itemIndex] = event.newItem;
             emit(
                 DataUpdated<T>(oldItem: event.oldItem, newItem: event.newItem));
-            emit(ListLoaded<T>(updatedItems));
+            emit(ListLoaded<T>(updatedItems, updateList: true));
           }
         }
       }

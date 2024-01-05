@@ -107,7 +107,7 @@ class _BlocListState<T, B extends BlocBase<S>, S>
 
         if (widget.stateCondition(state) is ListLoaded<T>) {
           var loadedState = widget.stateCondition(state) as ListLoaded<T>;
-          if (loadedState.items != null) {
+          if (loadedState.updateList) {
             items = loadedState.items;
           }
         }

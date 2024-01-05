@@ -9,7 +9,8 @@ class ListLoading extends ListState {}
 
 class ListLoaded<T> extends ListState {
   final List<T>? items;
-  ListLoaded(this.items);
+  final bool updateList;
+  ListLoaded(this.items, {this.updateList = false});
 }
 
 class DataAdded<T> extends ListState {
