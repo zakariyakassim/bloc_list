@@ -13,6 +13,13 @@ class ListLoaded<T> extends ListState {
   ListLoaded(this.items, {this.updateList = false});
 }
 
+class ItemError<T> extends ListState {
+  final ErrorType errorType;
+  final T item;
+  final String message;
+  ItemError(this.errorType, this.item, this.message);
+}
+
 class DataAdded<T> extends ListState {
   final T? item;
   DataAdded(this.item);

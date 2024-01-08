@@ -8,6 +8,5 @@ class ChatBloc extends ListBloc<ChatModel> {
       : super(
           dataProvider: ([id]) => dataService.getChatList(id),
           dataAdder: (item) => dataService.addChat(item),
-          dataDeleter: (item) => dataService.deleteChat(item),
         );
 }

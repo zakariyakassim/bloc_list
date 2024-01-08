@@ -16,6 +16,7 @@ class BlocList<T, B extends BlocBase<S>, S> extends StatefulWidget {
   final Function(T addedItem)? onItemAdding;
   final Function(T newItem, T oldItem)? onItemUpdated;
   final Function(T deletingItem)? onItemDeleting;
+  final Function(ErrorType errorType, T item, String errorMessage)? onItemError;
   final Function(T newItem, T oldItem)? onItemUpdating;
   final ListAction listAction;
 
@@ -33,6 +34,7 @@ class BlocList<T, B extends BlocBase<S>, S> extends StatefulWidget {
     this.onItemAdding,
     this.onItemDeleting,
     this.onItemUpdating,
+    this.onItemError,
     this.listAction = ListAction.prepend,
   });
 
@@ -54,6 +56,13 @@ class _BlocListState<T, B extends BlocBase<S>, S>
   @override
   Widget build(BuildContext context) {
     return BlocListener<B, S>(listener: (context, state) {
+      if (widget.stateCondition(state) is ItemError<T>) {
+        var errorState = widget.stateCondition(state) as ItemError;
+        if (widget.onItemError != null) {
+          widget.onItemError!(
+              errorState.errorType, errorState.item, errorState.message);
+        }
+      }
       if (widget.stateCondition(state) is DataDeleted<T>) {
         var deletedState = widget.stateCondition(state) as DataDeleted;
         if (widget.onItemDeleted != null) {

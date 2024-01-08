@@ -33,6 +33,10 @@ class _TodoListPageState extends State<TodoListPage> {
               color: Colors.black,
             ));
           },
+          onItemError: (errorType, item, errorMessage) {
+            item.isBusy = false;
+            _displaySnackBar(context, errorMessage);
+          },
           onItemAdding: (addingItem) {
             addingItem.isBusy = true;
           },
