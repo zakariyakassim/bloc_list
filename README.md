@@ -71,7 +71,6 @@ void main() {
             _displaySnackBar(context, "Added ${addedItem.description}");
           },
           itemBuilder: (context, index, item) {
-            // var added = item.id != null;
 
             var outputFormat = DateFormat('dd MMM yyyy HH:mm');
             var date = outputFormat.format(item.created);
@@ -135,4 +134,22 @@ class TodoBloc extends ListBloc<TodoModel> {
           dataUpdater: (item) => dataService.updateTodo(item),
         );
 }
+```
+
+```dart
+  Future<BlocResponse<List<TodoModel>>> getTodoList([int? id]) async {
+    final response = await http
+        .get(Uri.parse('https://example.com/todos'));
+
+    if (response.statusCode == 200) {
+      List<TodoModel> todos = (jsonDecode(response.body) as List<dynamic>)
+          .map((e) => TodoModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+
+      return BlocResponse<List<TodoModel>>(success: true, data: todos);
+    } else {
+      return BlocResponse<List<TodoModel>>(
+          success: false, message: "Error loading todos");
+    }
+  }
 ```

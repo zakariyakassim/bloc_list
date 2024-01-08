@@ -15,7 +15,8 @@ class BlocResponse<T> {
       {required this.success, this.data, this.message = "An error occured"});
 }
 
-typedef DataProvider<T> = Future<List<T>> Function([dynamic data]);
+typedef DataProvider<T> = Future<BlocResponse<dynamic>> Function(
+    [dynamic data]);
 typedef DataAdder<T> = Future<BlocResponse<T>> Function(T item);
 typedef DataDeleter<T> = Future<BlocResponse<T>> Function(T item);
 typedef DataSorter<T> = Function(List<T> items,
@@ -45,11 +46,16 @@ class ListBloc<T> extends Bloc<DataEvent, ListState> {
   Future<void> _onLoadData(LoadDataEvent event, Emitter<ListState> emit) async {
     emit(ListLoading());
     try {
-      var items = await dataProvider(event.data);
-      if (items.isNotEmpty && dataSorter != null) {
-        dataSorter!(items);
+      var response = await dataProvider(event.data);
+      if (response.success) {
+        final list = List<T>.from(response.data as List<T>? ?? []);
+        if (list.isNotEmpty && dataSorter != null) {
+          dataSorter!(list);
+        }
+        emit(ListLoaded<T>(list, updateList: true));
+      } else {
+        emit(ListError(response.message));
       }
-      emit(ListLoaded<T>(items, updateList: true));
     } catch (e) {
       emit(ListError(e.toString()));
     }
